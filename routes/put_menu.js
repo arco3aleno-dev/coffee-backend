@@ -9,7 +9,7 @@ router.put("/:id", (req, res) => {
 
     if (menu_name === undefined || price === undefined || category === undefined) {
         return res.status(400).json({
-            error: "กรุณาระบุข้อมูลให้ครบถ้วน: menu_name, price, category",
+            error: "กรุณาระบุข้อมูลให้ครบถ้วน : menu_name, price, category",
         });
     }
 
@@ -17,7 +17,7 @@ router.put("/:id", (req, res) => {
                  
     db.query(sql, [menu_name, price, category, id], (err, result) => {
         if (err) {
-            console.error("[PUT] Error:", err.message);
+            console.error("เกิดข้อผิดพลาด : ", err.message);
             return res.status(500).json({ error: "เกิดข้อผิดพลาดในการแก้ไขข้อมูลเมนู" });
         }
         if (result.affectedRows === 0) {

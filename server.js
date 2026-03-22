@@ -7,13 +7,15 @@ import putMenuRoute from "./routes/put_menu.js";
 import patchMenuRoute from './routes/patch_menu.js';
 import deleteMenuRoute from './routes/delete_menu.js';
 
+import getCustomerRoute from './routes/get_customer.js';
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const port = 3000;
 
-app.use("/api/routes/menus", [
+app.use("/api/menus", [
   getMenuRoute, 
   postMenuRoute, 
   putMenuRoute, 
@@ -21,6 +23,8 @@ app.use("/api/routes/menus", [
   deleteMenuRoute
 ]);
 
+app.use("/api/customers", getCustomerRoute);
+
 app.listen(port, () => {
-  console.log(`🟢 [SERVER] is running on http://localhost:${port}`);
+  console.log(`เซิร์ฟเวอร์กำลังทำงานอยู่ที่ : http://localhost:${port}`);
 });

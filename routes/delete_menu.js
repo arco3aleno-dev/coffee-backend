@@ -10,7 +10,7 @@ router.delete("/:id", (req, res) => {
   
   db.query(sql, [id], (err, result) => {
     if (err) {
-        console.error("[DELETE] Error:", err.message);
+        console.error("เกิดข้อผิดพลาด : ", err.message);
         return res.status(500).json({ error: "เกิดข้อผิดพลาดในการลบข้อมูลเมนู" });
     }
     if (result.affectedRows === 0) {

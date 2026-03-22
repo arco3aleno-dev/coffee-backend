@@ -8,7 +8,7 @@ router.post("/", (req, res) => {
   
   if (!menu_name || !price || !category) {
     return res.status(400).json({
-      error: "กรุณาระบุข้อมูลให้ครบถ้วน: menu_name, price, category",
+      error: "กรุณาระบุข้อมูลให้ครบถ้วน : menu_name, price, category",
     });
   }
 
@@ -16,7 +16,7 @@ router.post("/", (req, res) => {
   
   db.query(sql, [menu_name, price, category], (err, result) => {
     if (err) {
-      console.error("[POST] Error:", err.message);
+      console.error("เกิดข้อผิดพลาด : ", err.message);
       return res.status(500).json({ error: "เกิดข้อผิดพลาดในการเพิ่มข้อมูลเมนู" });
     }
     

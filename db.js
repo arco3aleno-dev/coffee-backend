@@ -9,10 +9,10 @@ const db = createConnection({
 
 db.connect((err) => {
   if (err) {
-    console.error("Error connecting to the database:", err.message);
+    console.error("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล : ", err.message);
     process.exit(1);
   }
-  console.log("Connected to the database.");
+  console.log("เชื่อมต่อฐานข้อมูลสำเร็จ");
 });
 
 export default db;

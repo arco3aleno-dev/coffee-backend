@@ -24,7 +24,7 @@ router.patch("/:id", (req, res) => {
 
   db.query(sql, values, (err, result) => {
     if (err) {
-        console.error("[PATCH] Error:", err.message);
+        console.error("เกิดข้อผิดพลาด : ", err.message);
         return res.status(500).json({ error: "เกิดข้อผิดพลาดในการอัปเดตข้อมูลเมนู" });
     }
     if (result.affectedRows === 0) {
