@@ -13,6 +13,10 @@ import postCustomerRoute from './routes/post_customer.js';
 import getToppingsRoute from './routes/get_topping.js';
 import postOrderRoute from './routes/post_order.js';
 
+import getReportRoute from './routes/get_report.js';
+
+import promotionRoute from './routes/promotion.js';
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -35,6 +39,12 @@ app.use("/api/customers", [
 app.use("/api/toppings", getToppingsRoute);
 
 app.use("/api/orders", postOrderRoute);
+
+app.use('/uploads', express.static('uploads'));
+
+app.use("/api/promotions", promotionRoute);
+
+app.use("/api/report", getReportRoute);
 
 app.listen(port, () => {
   console.log(`เซิร์ฟเวอร์กำลังทำงานอยู่ที่ : http://localhost:${port}`);

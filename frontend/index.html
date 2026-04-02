@@ -1,53 +1,360 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
-    <title>POS System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Backend | กลุ่มที่ 3</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Kanit', sans-serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .menu-card { transition: all 0.3s ease; }
+        .menu-card:active { transform: scale(0.95); }
+        .nav-btn.active { background-color: #facc15; color: #1e3a8a; font-weight: 600; }
+        .nav-btn { transition: all 0.3s; }
+        .nav-btn:hover:not(.active) { background-color: rgba(255, 255, 255, 0.1); }
+    </style>
 </head>
+<body class="bg-gray-50 h-screen overflow-hidden flex text-gray-800">
 
+    <aside class="w-24 lg:w-64 bg-blue-900 text-white flex flex-col shadow-2xl z-20">
+        <div class="p-6 text-center border-b border-blue-800">
+            <i class="fa-solid fa-mug-hot text-yellow-400 text-4xl mb-2 drop-shadow-md"></i>
+            <h1 class="hidden lg:block text-xl font-bold tracking-wide">POS |<span class="text-yellow-400"> กลุ่มที่ 3</span></h1>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <button onclick="switchTab('pos')" id="tab-pos" class="nav-btn active w-full flex items-center p-3 rounded-xl gap-3">
+                <i class="fa-solid fa-cash-register text-xl"></i>
+                <span class="hidden lg:block">หน้าขาย (เมนู)</span>
+            </button>
 
-<body class="bg-gray-100 p-8 flex gap-6 h-screen overflow-hidden">
-    <div class="w-2/3">
-        <h1 class="text-3xl font-bold mb-6">ระบบสั่งเครื่องดื่ม</h1>
-        <div id="menu-list" class="grid grid-cols-3 gap-4 overflow-auto pb-10"></div>
-    </div>
-    <div class="w-1/3 bg-white p-6 shadow-xl rounded-2xl flex flex-col h-full">
-        <h2 class="text-2xl font-bold mb-4 border-b pb-2">ตะกร้าสินค้า</h2>
-<div class="bg-blue-50 p-4 rounded-xl mb-4 border border-blue-100">
-            <h3 class="font-bold text-lg text-blue-800 mb-2">ข้อมูลลูกค้า</h3>
-            <div class="flex gap-2">
-                <input type="text" id="search-phone" placeholder="ค้นหาเบอร์โทร..." class="flex-1 p-2 border rounded-lg focus:outline-none">
-                <button onclick="searchCustomer()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold">ค้นหา</button>
+            <div class="pt-6 pb-2 hidden lg:block">
+                <p class="text-xs text-blue-300 font-bold uppercase tracking-wider pl-3">Backend</p>
             </div>
-            <div id="customer-info" class="hidden mt-2 p-2 bg-green-100 text-green-800 rounded-lg font-bold">คุณ <span id="c-name"></span></div>
-        </div>
 
-        <div id="cart-list" class="flex-1 overflow-auto"></div>
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-btn w-full flex items-center p-3 rounded-xl gap-3">
+                <i class="fa-solid fa-chart-pie text-xl"></i>
+                <span class="hidden lg:block">Dashboard</span>
+            </button>
+            <button onclick="switchTab('promotions')" id="tab-promotions" class="nav-btn w-full flex items-center p-3 rounded-xl gap-3">
+                <i class="fa-solid fa-tags text-xl"></i>
+                <span class="hidden lg:block">จัดการโปรโมชัน</span>
+            </button>
+            <button onclick="switchTab('recommend')" id="tab-recommend" class="nav-btn w-full flex items-center p-3 rounded-xl gap-3">
+                <i class="fa-solid fa-star text-xl"></i>
+                <span class="hidden lg:block">จัดการเมนูแนะนำ</span>
+            </button>
+        </nav>
+    </aside>
 
-        <div id="checkout-zone" class="mt-4">
-            <button onclick="checkoutReal()" class="w-full py-4 bg-green-600 text-white font-bold rounded-xl text-2xl">ชำระเงิน</button>
-        </div>
-    </div>
-
-<div id="option-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
-        <div class="bg-white p-8 rounded-2xl w-96 shadow-2xl">
-            <h2 id="modal-menu-name" class="text-2xl font-bold mb-4">...</h2>
-            <select id="modal-size" class="w-full p-3 border rounded-xl mb-4 text-lg">
-                <option value="M" selected>ไซส์ M</option>
-                <option value="L">ไซส์ L (+10฿)</option>
-            </select>
-            <div id="modal-toppings" class="space-y-2 mb-6 border p-4 rounded-xl bg-gray-50"></div>
-            <div class="flex gap-4">
-                <button onclick="closeModal()" class="flex-1 py-3 bg-gray-200 rounded-xl font-bold">ยกเลิก</button>
-                <button onclick="confirmAddToCart()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">ยืนยัน</button>
+    <main class="flex-1 relative flex flex-col h-full overflow-hidden">
+        
+        <section id="section-pos" class="flex-1 flex gap-6 p-6 h-full transition-opacity duration-300">
+            <div class="w-2/3 flex flex-col">
+                <header class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-blue-900"><i class="fa-solid fa-mug-saucer mr-2 text-yellow-500"></i> เมนู</h2>
+                </header>
+                <div id="promo-banner-container" class="w-full max-w-[600px] h-[200px] mx-auto bg-gray-100 rounded-2xl mb-4 overflow-hidden relative shadow-sm hidden">
+                </div>
+                <div id="category-filter" class="flex gap-2 overflow-x-auto mb-4 pb-2"></div>
+                <div id="menu-list" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto pb-10 pr-2 content-start"></div>
             </div>
+
+            <div class="w-1/3 glass-panel p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-3xl flex flex-col border border-gray-100">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-blue-900 border-b pb-3">
+                    <i class="fa-solid fa-cart-shopping text-yellow-500"></i> ตะกร้าสินค้า
+                </h2>
+                
+                <div class="bg-blue-50/50 p-4 rounded-2xl mb-4 border border-blue-100">
+                    <div class="flex gap-2">
+                        <input type="text" id="search-phone" placeholder="ค้นหาเบอร์โทรลูกค้า/สมาชิก ..." class="flex-1 p-2.5 rounded-xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 text-sm shadow-inner transition-all">
+                        <button onclick="searchCustomer()" class="bg-blue-800 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium shadow-md transition-all active:scale-95"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    </div>
+                    <div id="customer-info" class="hidden mt-3 p-3 bg-green-100 text-green-800 rounded-xl font-medium text-sm border border-green-200 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> คุณ <span id="c-name" class="font-bold"></span>
+                    </div>
+
+                    <div class="mt-4 bg-yellow-50 p-4 rounded-2xl border border-yellow-100 shadow-sm">
+                        <label class="block text-xs font-bold text-yellow-700 mb-2 uppercase tracking-wider">ส่วนลด</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="promo-code-input" placeholder="ใส่โค้ดส่วนลด ..." class="flex-1 p-2.5 rounded-xl border-none ring-1 ring-yellow-200 focus:ring-2 focus:ring-yellow-500 text-sm shadow-inner">
+                            <button onclick="applyPromoCode()" class="bg-yellow-500 hover:bg-yellow-600 text-blue-900 px-4 py-2 rounded-xl font-bold shadow-md transition-all active:scale-95">ใช้โค้ดส่วนลด</button>
+                        </div>
+                        <div id="applied-promo-info" class="hidden mt-3 p-2.5 bg-white rounded-lg border border-yellow-200 text-xs font-bold text-green-600 flex justify-between items-center animate-pulse">
+                            <span><i class="fa-solid fa-circle-check mr-1"></i> โค้ด : <span id="display-promo-code" class="text-blue-900"></span></span>
+                            <button onclick="removePromoCode()" class="text-red-500 hover:text-red-700 transition-colors"><i class="fa-solid fa-trash-can"></i> ยกเลิก</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cart-list" class="flex-1 overflow-y-auto space-y-3 pr-2"></div>
+
+                <div id="checkout-zone" class="mt-4 pt-4 border-t">
+                    <div class="flex justify-between items-center mb-4 text-lg">
+                        <span class="font-medium text-gray-500">ยอดรวมทั้งสิ้น</span>
+                        <span id="cart-total" class="text-2xl font-bold text-blue-900">0 ฿</span>
+                    </div>
+                    <button onclick="checkoutReal()" class="w-full py-4 bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold rounded-2xl text-lg shadow-[0_4px_14px_0_rgba(250,204,21,0.39)] transition-all active:scale-95 flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-money-bill-wave"></i> ชำระเงิน
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-dashboard" class="hidden flex-1 flex-col space-y-6 p-6 h-full overflow-y-auto bg-gray-50">
+            <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-2xl font-bold text-blue-900"><i class="fa-solid fa-chart-pie mr-2 text-yellow-500"></i> Dashboard</h2>
+                <div class="flex items-center gap-3 bg-gray-50 p-2 rounded-xl border border-gray-200">
+                    <label class="text-sm font-medium text-gray-500"><i class="fa-regular fa-calendar-days mr-1"></i> เลือกวันที่ :</label>
+                    <input type="date" id="date-filter" onchange="loadRealReports()" class="bg-transparent border-none focus:ring-0 outline-none text-blue-900 font-bold">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-gradient-to-br from-blue-800 to-blue-600 p-5 rounded-3xl text-white shadow-md relative overflow-hidden">
+                    <i class="fa-solid fa-wallet absolute -right-4 -bottom-4 text-6xl text-white opacity-20"></i>
+                    <p class="text-sm text-blue-100 font-medium mb-1">ยอดขายรวม (บาท)</p>
+                    <h4 id="report-total-sales" class="text-3xl font-bold">0</h4>
+                </div>
+                <div class="bg-gradient-to-br from-yellow-400 to-yellow-500 p-5 rounded-3xl text-blue-900 shadow-md relative overflow-hidden">
+                    <i class="fa-solid fa-receipt absolute -right-4 -bottom-4 text-6xl text-yellow-600 opacity-20"></i>
+                    <p class="text-sm font-medium mb-1">จำนวนออเดอร์ (บิล)</p>
+                    <h4 id="report-total-orders" class="text-3xl font-bold">0</h4>
+                </div>
+                <div class="bg-white p-5 rounded-3xl text-blue-900 shadow-sm border border-gray-100 relative overflow-hidden">
+                    <i class="fa-solid fa-crown absolute -right-4 -bottom-4 text-6xl text-gray-100"></i>
+                    <p class="text-sm text-gray-500 font-medium mb-1">เมนูขายดีอันดับ 1</p>
+                    <h4 id="report-top-menu" class="text-2xl font-bold text-blue-800">-</h4>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col">
+                    <h3 class="font-bold text-lg text-gray-700 mb-4"><i class="fa-solid fa-chart-simple text-blue-500 mr-2"></i>สัดส่วนยอดขายตามหมวดหมู่</h3>
+                    <div class="relative w-full flex-1" style="min-height: 250px;"> 
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col">
+                    <h3 class="font-bold text-lg text-gray-700 mb-4"><i class="fa-solid fa-crown text-yellow-500 mr-2"></i>5 อันดับเมนูขายดี</h3>
+                    <div class="relative w-full flex-1" style="min-height: 250px;"> 
+                        <canvas id="topMenuChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <h3 class="font-bold text-lg text-gray-700 mb-4"><i class="fa-solid fa-list text-blue-500 mr-2"></i>รายการขาย</h3>
+                <small class="text-gray-400 mb-3 block">* แสดงข้อมูลการขายในวันที่เลือก หากไม่เลือกจะแสดงข้อมูลของทุกวัน</small>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-sm border-b">
+                                <th class="p-3 font-medium">รหัสบิล</th>
+                                <th class="p-3 font-medium">เวลา - เวลา</th>
+                                <th class="p-3 font-medium">ลูกค้า</th>
+                                <th class="p-3 font-medium">เบอร์โทรศัพท์</th>
+                                <th class="p-3 font-medium text-right">ยอดรวม (บาท)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="daily-sales-table" class="text-sm">
+                            <tr><td colspan="5" class="text-center p-4 text-gray-400">รอโหลดข้อมูล ...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-promotions" class="hidden flex-1 p-6 h-full overflow-y-auto bg-gray-50">
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+                
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 xl:col-span-1 sticky top-0">
+                    <h3 class="font-bold text-xl mb-4 text-blue-900 border-b pb-3"><i class="fa-solid fa-ticket text-yellow-500 mr-2"></i>เพิ่มโปรโมชัน</h3>
+                    <form id="promoForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">รหัสโปรโมชัน</label>
+                            <input type="text" id="promo_id" class="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 text-sm" required placeholder="เช่น SUMMER50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">ชื่อโปรโมชัน</label>
+                            <input type="text" id="promo_name" class="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 text-sm" required placeholder="ลดรับหน้าร้อน">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">ส่วนลด (บาท)</label>
+                            <input type="number" id="discount_amount" class="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 text-sm" required placeholder="50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-2">หมวดหมู่ที่ร่วมรายการ</label>
+                            <div class="flex flex-wrap gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                                <label class="inline-flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="promo_cat" value="ทั้งหมด" class="w-4 h-4 text-blue-600 rounded" checked> <span class="text-xs font-medium text-gray-700">ทั้งหมด</span>
+                                </label>
+                                <label class="inline-flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="promo_cat" value="กาแฟ" class="w-4 h-4 text-blue-600 rounded"> <span class="text-xs font-medium text-gray-700">กาแฟ</span>
+                                </label>
+                                <label class="inline-flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="promo_cat" value="ชา" class="w-4 h-4 text-blue-600 rounded"> <span class="text-xs font-medium text-gray-700">ชา</span>
+                                </label>
+                                <label class="inline-flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="promo_cat" value="เบเกอรี่" class="w-4 h-4 text-blue-600 rounded"> <span class="text-xs font-medium text-gray-700">เบเกอรี่</span>
+                                </label>
+                                <label class="inline-flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="promo_cat" value="เครื่องดื่มอื่นๆ" class="w-4 h-4 text-blue-600 rounded"> <span class="text-xs font-medium text-gray-700">อื่นๆ</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">วันหมดอายุโปรโมชัน</label>
+                            <input type="date" id="expiry_date" class="w-full p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">รูปภาพแบนเนอร์โปรโมชัน</label>
+                            <input type="file" id="promo_image_input" accept="image/*" class="w-full p-1.5 border border-gray-200 rounded-xl text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:bg-blue-50 file:text-blue-700 file:border-0 hover:file:bg-blue-100">
+                        </div>
+                        <button type="submit" class="bg-blue-800 hover:bg-blue-700 text-white px-4 py-3 rounded-xl font-bold shadow-md w-full mt-2 transition-all active:scale-95">
+                            <i class="fa-solid fa-save mr-2"></i> เพิ่มโปรโมชัน
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 xl:col-span-2">
+                    <h3 class="font-bold text-xl mb-4 text-blue-900 border-b pb-3"><i class="fa-solid fa-list-check text-yellow-500 mr-2"></i>รายการโปรโมชันทั้งหมด</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-500 text-sm border-b">
+                                    <th class="p-3 font-medium">รูปแบนเนอร์</th>
+                                    <th class="p-3 font-medium">รหัส/ชื่อโปรโมชัน</th>
+                                    <th class="p-3 font-medium">หมวดหมู่</th> 
+                                    <th class="p-3 font-medium text-center">ส่วนลด</th>
+                                    <th class="p-3 font-medium text-center">สถานะ/วันหมดอายุ</th>
+                                    <th class="p-3 font-medium text-center">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="promo-list-table" class="text-sm">
+                                <tr><td colspan="6" class="text-center p-8 text-gray-400">รอโหลดข้อมูล ...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="section-recommend" class="hidden flex-1 p-6 h-full overflow-y-auto bg-gray-50">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 max-w-5xl mx-auto">
+                <h3 class="font-bold text-2xl mb-6 text-blue-900 border-b pb-4"><i class="fa-solid fa-star text-yellow-500 mr-2"></i>จัดการเมนูแนะนำ</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-sm border-b">
+                                <th class="p-4 font-medium rounded-tl-xl">รหัสเมนู</th>
+                                <th class="p-4 font-medium">ชื่อเมนู</th>
+                                <th class="p-4 font-medium">หมวดหมู่</th>
+                                <th class="p-4 font-medium text-center rounded-tr-xl">เปิด/ปิดเมนูแนะนำ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recommend-list-table" class="text-sm">
+                            <tr><td colspan="4" class="text-center p-8 text-gray-400">รอโหลดข้อมูล ...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="option-modal" class="fixed inset-0 bg-blue-900/40 backdrop-blur-sm hidden flex items-center justify-center z-50 opacity-0 transition-opacity duration-300">
+        <div class="bg-white p-8 rounded-3xl w-[400px] shadow-2xl transform scale-95 transition-transform duration-300" id="modal-content">
+            <div class="flex justify-between items-center mb-6 border-b pb-3">
+                <h2 id="modal-menu-name" class="text-2xl font-bold text-blue-900"> ...</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-gray-500 mb-2">เลือกขนาด</label>
+                <select id="modal-size" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-lg focus:ring-2 focus:ring-yellow-400 outline-none">
+                    <option value="M" selected>ไซส์ M (ปกติ)</option>
+                    <option value="L">ไซส์ L (+10฿)</option>
+                </select>
+            </div>
+
+            <div class="mb-8">
+                <label class="block text-sm font-medium text-gray-500 mb-2">เพิ่มท็อปปิ้ง</label>
+                <div id="modal-toppings" class="space-y-2 max-h-40 overflow-y-auto pr-2"></div>
+            </div>
+
+            <button onclick="confirmAddToCart()" class="w-full py-4 bg-blue-800 hover:bg-blue-900 text-white rounded-2xl font-bold text-lg shadow-lg transition-all active:scale-95">
+                ยืนยันการสั่ง
+            </button>
         </div>
     </div>
 
+    <div id="edit-promo-modal" class="fixed inset-0 bg-blue-900/40 backdrop-blur-sm hidden flex items-center justify-center z-50 opacity-0 transition-opacity duration-300">
+        <div class="bg-white p-8 rounded-3xl w-full max-w-2xl shadow-2xl transform scale-95 transition-transform duration-300" id="edit-promo-content">
+            <div class="flex justify-between items-center mb-6 border-b pb-3">
+                <h2 class="text-2xl font-bold text-blue-900"><i class="fa-solid fa-pen-to-square mr-2 text-yellow-500"></i>แก้ไขโปรโมชัน</h2>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <form id="editPromoForm" class="space-y-4">
+                <input type="hidden" id="edit_promo_id"> <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">ชื่อโปรโมชัน</label>
+                        <input type="text" id="edit_promo_name" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">ส่วนลด (บาท)</label>
+                        <input type="number" id="edit_discount_amount" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-3">หมวดหมู่ที่ร่วมรายการ</label>
+                    <div class="flex flex-wrap gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="edit_promo_cat" value="ทั้งหมด" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="text-sm font-medium text-gray-700">ทั้งหมด</span>
+                        </label>
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="edit_promo_cat" value="กาแฟ" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="text-sm font-medium text-gray-700">กาแฟ</span>
+                        </label>
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="edit_promo_cat" value="ชา" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="text-sm font-medium text-gray-700">ชา</span>
+                        </label>
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="edit_promo_cat" value="เบเกอรี่" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="text-sm font-medium text-gray-700">เบเกอรี่</span>
+                        </label>
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="edit_promo_cat" value="เครื่องดื่มอื่นๆ" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="text-sm font-medium text-gray-700">อื่นๆ</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">วันหมดอายุโปรโมชัน</label>
+                    <input type="date" id="edit_expiry_date" class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">รูปภาพแบนเนอร์ <span class="text-red-400 font-normal">(เลือกไฟล์ใหม่เฉพาะเมื่อต้องการเปลี่ยนรูป)</span></label>
+                    <input type="file" id="edit_promo_image_input" accept="image/*" class="w-full p-2 border border-gray-200 rounded-xl text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:bg-blue-50 file:text-blue-700 file:border-0 hover:file:bg-blue-100 transition-colors">
+                </div>
+                
+                <button type="submit" class="w-full py-4 bg-blue-800 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md transition-all active:scale-95 text-lg mt-4">
+                    <i class="fa-solid fa-save mr-2"></i> บันทึกการแก้ไข
+                </button>
+            </form>
+        </div>
+    </div>
 
     <script src="pos.js"></script>
 </body>
-
 </html>

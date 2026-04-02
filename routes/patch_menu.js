@@ -3,6 +3,24 @@ import db from "../db.js";
 
 const router = express.Router();
 
+// ==========================================
+// [PATCH] อัปเดตสถานะเมนูแนะนำ
+// ==========================================
+router.patch("/:id/recommend", (req, res) => {
+  const { id } = req.params;
+  const { is_recommended } = req.body; // รับค่า 0 หรือ 1
+
+  const sql = "UPDATE Menu SET is_recommended = ? WHERE menu_id = ?";
+
+  db.query(sql, [is_recommended, id], (err, result) => {
+    if (err) {
+        console.error("เกิดข้อผิดพลาด : ", err.message);
+        return res.status(500).json({ status: "error", message: "เกิดข้อผิดพลาดในการอัปเดตสถานะเมนูแนะนำ" });
+    }
+    res.json({ status: "success", message: "อัปเดตสถานะเมนูแนะนำสำเร็จ" });
+  });
+});
+
 router.patch("/:id", (req, res) => {
   const { id } = req.params;
   const { menu_name, price, category } = req.body;

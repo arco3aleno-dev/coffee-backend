@@ -3,8 +3,11 @@ import db from "../db.js";
 
 const router = express.Router();
 
-router.get("/:phone", (req, res) => {
-  const { phone } = req.params;
+// จุดที่ 1: เปลี่ยนจาก "/:phone" เป็น "/" เฉยๆ เพื่อรับค่าจาก Query String
+router.get("/", (req, res) => {
+  
+  // จุดที่ 2: เปลี่ยนจาก req.params เป็น req.query
+  const { phone } = req.query;
 
   const sql = "SELECT * FROM customer WHERE phone = ?";
 
@@ -17,7 +20,8 @@ router.get("/:phone", (req, res) => {
     if (results.length > 0) {
       return res.json({
         status: "success",
-        data: results[0]
+        // จุดที่ 3: เปลี่ยนจาก results[0] เป็น results (ส่งไปเป็น Array เพื่อให้หน้าเว็บนับ length ได้)
+        data: results
       });
     }
 
