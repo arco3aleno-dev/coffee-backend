@@ -1,9 +1,9 @@
 let menus = [];
 let toppings = [];
 let cart = [];
-let currentMenuId = null; // เปลี่ยนจากการเก็บ Index มาเก็บ ID แทน
+let currentMenuId = null;
 let currentCustomer = null;
-let currentCategory = 'ทั้งหมด'; // เก็บสถานะหมวดหมู่ปัจจุบัน
+let currentCategory = 'ทั้งหมด';
 
 // ==========================================
 // ระบบ Switch Tab
@@ -579,7 +579,7 @@ async function loadRealReports() {
 }
 
 // ==========================================
-// ฟังก์ชันโหลดข้อมูลตารางจัดการโปรโมชัน
+// [GET] ฟังก์ชันโหลดข้อมูลตารางจัดการโปรโมชัน
 // ==========================================
 async function loadPromotionTable() {
     try {
@@ -638,7 +638,7 @@ loadData();
 renderCart();
 
 // ==========================================
-// ฟังก์ชันส่งข้อมูลฟอร์มโปรโมชัน+รูปภาพ
+// [POST] ฟังก์ชันส่งข้อมูลฟอร์มโปรโมชัน+รูปภาพ
 // ==========================================
 document.getElementById('promoForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -710,7 +710,7 @@ categoryCheckboxes.forEach(cb => {
 });
 
 // ==========================================
-// ฟังก์ชันยืนยันการลบโปรโมชัน
+// [DELETE] ฟังก์ชันยืนยันการลบโปรโมชัน
 // ==========================================
 async function deletePromo(id) {
     if(!confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบโปรโมชัน รหัส : ${id} ?`)) return;
@@ -775,7 +775,9 @@ editCatCheckboxes.forEach(cb => {
     });
 });
 
-// ส่งข้อมูลไป PUT
+// ==========================================
+// [PUT] ฟังก์ชันส่งข้อมูลแก้ไขโปรโมชัน+รูปภาพ
+// ==========================================
 document.getElementById('editPromoForm').addEventListener('submit', async (e) => {
     e.preventDefault(); 
     
@@ -848,6 +850,9 @@ async function loadRecommendTable() {
     }
 }
 
+// ==========================================
+// [PATCH] ฟังก์ชันอัปเดตสถานะเมนูแนะนำ
+// ==========================================
 async function toggleRecommend(menuId, isChecked) {
     const newStatus = isChecked ? 1 : 0;
     try {

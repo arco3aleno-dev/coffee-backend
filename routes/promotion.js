@@ -26,7 +26,6 @@ router.post('/', upload.single('promo_image'), async (req, res) => {
     let { promo_id, promo_name, discount_amount, applicable_categories, expiry_date } = req.body;
     const promo_image = req.file ? req.file.filename : null;
     
-    // จัดการแปลงค่าว่างให้เป็น null เพื่อไม่ให้ Database Error
     expiry_date = (expiry_date === '' || expiry_date === 'undefined' || !expiry_date) ? null : expiry_date;
 
     const sql = `INSERT INTO promotions (promo_id, promo_name, discount_amount, promo_image, applicable_categories, expiry_date) VALUES (?, ?, ?, ?, ?, ?)`;
